@@ -1,0 +1,31 @@
+name: deploy myblog
+
+on:
+    push:  # 当main分支被push，以及paths里面定义的被改变时，触发xxx命令
+        branches: 
+            - 'main' #push操作时，对应的分支
+        paths: 
+            - '.github/workflows/*' #什么文件或者文件夹里的文件变动时，触发
+            - 'src/*'
+            - 'package.json'
+            - 'bin/*'
+
+jobs: 
+    deploy:
+        runs-on: ubuntu-lateset
+
+        steps:
+            - uses: actions/checkout@v2 #使用哪一个已经好了的action，除了这个action之外，还有其他功能的action
+
+            - name: create a folder #name表示要运行的命令的名称，可以随意自定义
+              run: mkdir test-folder #run表示要运行的命令
+
+            - name: create a file
+              run: | #如果要运行多个命令，则添加一个|
+                cd test-folder
+                touch a.txt
+                echo "hello world" > a.txt
+                cat a.txt
+                
+            - name: delete a file
+              run: rm -f a.txt
