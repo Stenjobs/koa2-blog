@@ -12,10 +12,11 @@ on:
 
 jobs: 
     deploy:
-        runs-on: ubuntu-lateset
+        runs-on: ubuntu-latest
+        timeout-minutes: 15
 
         steps:
-            - uses: actions/checkout@v2 #使用哪一个已经好了的action，除了这个action之外，还有其他功能的action
+            - uses: actions/checkout@v4 #使用哪一个已经好了的action，除了这个action之外，还有其他功能的action
 
             - name: create a folder #name表示要运行的命令的名称，可以随意自定义
               run: mkdir test-folder #run表示要运行的命令
