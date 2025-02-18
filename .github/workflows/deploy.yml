@@ -42,7 +42,7 @@ jobs:
                   echo "Changed to directory: $(pwd)" &&
                   git pull &&
                   npm install &&
-                  npm run build &&
+                  npm run production &&
                   pm2 restart myblog
                 ' || {
                     echo "部署失败，错误代码: $?"
