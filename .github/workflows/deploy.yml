@@ -42,8 +42,7 @@ jobs:
                   echo "Changed to directory: $(pwd)" &&
                   git pull &&
                   npm install &&
-                  npm run production &&
-                  pm2 restart koa2-blog
+                  npm run production
                 ' || {
                     echo "部署失败，错误代码: $?"
                     exit 1
