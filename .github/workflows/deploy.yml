@@ -18,15 +18,17 @@ jobs:
         steps:
             - uses: actions/checkout@v4 #使用哪一个已经好了的action，除了这个action之外，还有其他功能的action
 
-            - name: create a folder #name表示要运行的命令的名称，可以随意自定义
-              run: mkdir test-folder #run表示要运行的命令
+            - name: set id_rsa # 设置id_rsa
+              uses: ssh-action@v2 # 使用ssh-action
+              with:
+                key: ${{ secrets.ALIYUN_ESC_SECRET }} # 这是在github的settings/secrets and variables/actions中设置的
+                #known_hosts: ${{ secrets.KNOWN_HOSTS }} 
 
-            - name: create a file
-              run: | #如果要运行多个命令，则添加一个|
-                cd test-folder
-                touch a.txt
-                echo "hello world" > a.txt
-                cat a.txt
+            - name: deploy # 部署
+              run: |
+                cd /project/blogs/server
+                git pull
+                npm install
+                npm run build
+                pm2 restart myblog
 
-            - name: delete a file
-              run: rm -f a.txt

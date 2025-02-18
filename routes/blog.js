@@ -8,7 +8,11 @@ router.prefix('/api/blog')
 // 模拟pm2发生错误时路由
 router.get('/error', async function (ctx, next) {
     throw new Error('发生错误')
-})  
+})
+
+router.get('/test', async function (ctx, next) {
+    ctx.body = 'test ok -- deploy success'
+})
 
 router.get('/list', async function (ctx, next) {
     const { author, keyword, page, pageSize } = ctx.query
