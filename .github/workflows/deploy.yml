@@ -9,8 +9,16 @@ on:
             - 'src/*'
             - 'package.json'
             - 'bin/*'
-
+            - 'routes/*'
+            - 'public/*'
+            - 'config/*'
+            - 'controller/*'
+            - 'middleware/*'
+            - 'model/*'
+            - 'utils/*'
+            
 jobs: 
+
     deploy:
         runs-on: ubuntu-latest
         timeout-minutes: 15
