@@ -43,7 +43,7 @@ jobs:
                   git pull &&
                   npm install &&
                   npm run production &&
-                  pm2 restart myblog
+                  pm2 restart koa2-blog
                 ' || {
                     echo "部署失败，错误代码: $?"
                     exit 1
