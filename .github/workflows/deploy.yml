@@ -33,6 +33,8 @@ jobs:
 
             - name: deploy # 部署
               run: |
+                echo "Starting deployment..."
+                ssh -o StrictHostKeyChecking=no root@8.134.205.132
                 cd /project/blogs/server
                 git pull
                 npm install
