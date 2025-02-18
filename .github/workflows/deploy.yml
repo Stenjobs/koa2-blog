@@ -34,11 +34,18 @@ jobs:
             - name: deploy # 部署
               run: |
                 echo "Starting deployment..."
-                ssh -o StrictHostKeyChecking=no root@8.134.205.132 '
+                # 添加 SSH 详细输出
+                ssh -v -o StrictHostKeyChecking=no root@8.134.205.132 '
+                  set -x &&  # 在远程服务器上启用命令回显
+                  echo "Current directory: $(pwd)" &&
                   cd /project/blogs/server &&
+                  echo "Changed to directory: $(pwd)" &&
                   git pull &&
                   npm install &&
                   npm run build &&
                   pm2 restart myblog
-                '
+                ' || {
+                    echo "部署失败，错误代码: $?"
+                    exit 1
+                }
 
