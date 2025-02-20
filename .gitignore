@@ -2,4 +2,7 @@ node_modules
 logs/*
 !logs/.gitkeep
 .DS_Store
-uploads/
+# 忽略 uploads 目录下的所有文件，但保留文件夹结构
+uploads/*
+!uploads/*/
+!uploads/.gitkeep
