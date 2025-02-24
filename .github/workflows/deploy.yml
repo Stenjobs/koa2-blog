@@ -17,6 +17,7 @@ on:
             - 'model/*'
             - 'utils/*'
             - '.gitignore'
+            - 'app.js'
             
 jobs: 
 
