@@ -11,7 +11,7 @@ router.get('/error', async function (ctx, next) {
 })
 
 router.get('/test', async function (ctx, next) {
-    ctx.body = '113331 test ok -- deploy success'
+    ctx.body = '113331 test ok -- deploy success3333'
 })
 
 router.get('/list', async function (ctx, next) {
