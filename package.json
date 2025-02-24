@@ -25,6 +25,7 @@
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
     "koa-views": "^6.2.0",
+    "koa2-cors": "^2.0.6",
     "mongoose": "^8.8.4",
     "pug": "^2.0.3",
     "redis": "^4.7.0",
