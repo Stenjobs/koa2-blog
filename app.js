@@ -17,7 +17,7 @@ const Visit = require('./db/model/visit')
 // 设置静态文件目录
 app.use(static(path.join(__dirname, 'uploads')));
 
-// 添加cors中间件配置
+// 添加cors中间件配置 
 app.use(cors({
   // origin: function(ctx) { // 设置允许来自指定域名请求
   //   return '*'; // 允许来自所有域名请求
