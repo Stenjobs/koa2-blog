@@ -15,6 +15,7 @@ module.exports = async (ctx, next) => {
         ctx.state.user = decoded // 将解码后的用户信息存储到ctx.state中供后续使用
         await next()
     } catch (err) {
+        console.error('登录验证失败:', err)
         ctx.body = new ErrorModel('请重新登录', '', 401)
         return
     }
