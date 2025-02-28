@@ -229,7 +229,15 @@ const getAnalytics = async () => {
         }
 
         // 格式化活跃度数据
-        const activityMap = new Map(activityData.map(item => [item._id, item]))
+        const activityMap = new Map()
+        activityData.forEach(item => {
+            activityMap.set(item._id, {
+                posts: item.posts || 0,
+                likes: item.likes || 0,
+                comments: item.comments || 0
+            })
+        })
+
         const formattedActivityData = {
             xAxis: dates,
             series: {
@@ -240,10 +248,10 @@ const getAnalytics = async () => {
         }
 
         dates.forEach(date => {
-            const data = activityMap.get(date) || { posts: 0, likes: 0, comments: 0 }
-            formattedActivityData.series.posts.push(data.posts)
-            formattedActivityData.series.likes.push(data.likes)
-            formattedActivityData.series.comments.push(data.comments)
+            const data = activityMap.get(date)
+            formattedActivityData.series.posts.push(data ? data.posts : 0)
+            formattedActivityData.series.likes.push(data ? data.likes : 0)
+            formattedActivityData.series.comments.push(data ? data.comments : 0)
         })
 
         // 格式化用户趋势数据
