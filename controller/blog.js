@@ -1,6 +1,9 @@
 const Blog = require('../db/model/blog')
 const mongoose = require('mongoose')
 const xss = require('xss')
+const User = require('../db/model/user')
+const Visit = require('../db/model/visit')
+
 const getList = async (author = '', keyword = '', page = 1, pageSize = 10) => {
     const whereOption = {}
     // mongoose查询
@@ -139,6 +142,92 @@ const replyComment = async (blogId, commentId, replyData, replyToId) => {
     }
 };
 
+const getAnalytics = async () => {
+    try {
+        // 获取今天的开始时间
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        
+        // 获取30天前的时间
+        const thirtyDaysAgo = new Date()
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
+        
+        // 获取总访问量（这需要你在应用中添加访问记录）
+        const totalVisits = await Visit.countDocuments()
+        
+        // 获取今日新增用户
+        const newUsers = await User.countDocuments({
+            createdAt: { $gte: today }
+        })
+        
+        // 获取今日新发帖量
+        const newPosts = await Blog.countDocuments({
+            createdAt: { $gte: today }
+        })
+        
+        // 获取近30天的活跃度数据
+        const activityData = await Blog.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: thirtyDaysAgo }
+                }
+            },
+            {
+                $group: {
+                    _id: { 
+                        $dateToString: { 
+                            format: "%Y-%m-%d", 
+                            date: "$createdAt" 
+                        }
+                    },
+                    posts: { $sum: 1 },
+                    likes: { $sum: "$likes" },
+                    comments: { $sum: { $size: "$comments" } }
+                }
+            },
+            {
+                $sort: { _id: 1 }
+            }
+        ])
+        
+        // 获取近30天新增用户数据
+        const newUsersTrend = await User.aggregate([
+            {
+                $match: {
+                    createdAt: { $gte: thirtyDaysAgo }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: {
+                            format: "%Y-%m-%d",
+                            date: "$createdAt"
+                        }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            {
+                $sort: { _id: 1 }
+            }
+        ])
+
+        return {
+            overview: {
+                totalVisits,
+                todayNewUsers: newUsers,
+                todayNewPosts: newPosts
+            },
+            activityTrend: activityData,
+            userTrend: newUsersTrend
+        }
+    } catch (err) {
+        console.error('获取分析数据失败:', err)
+        return null
+    }
+}
+
 module.exports = {
     getList,
     getDetail,
@@ -147,5 +236,6 @@ module.exports = {
     delBlog,
     likeBlog,
     addComment,
-    replyComment
+    replyComment,
+    getAnalytics
 }

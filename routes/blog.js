@@ -1,6 +1,6 @@
 const router = require('koa-router')()
 const { SuccessModel, ErrorModel } = require('../model/resModel')
-const { delBlog, getList, newBlog, updataBlog, getDetail, likeBlog, addComment, replyComment } = require('../controller/blog')
+const { delBlog, getList, newBlog, updataBlog, getDetail, likeBlog, addComment, replyComment, getAnalytics } = require('../controller/blog')
 const loginCheck = require('../middleware/loginCheck')
 
 router.prefix('/api/blog')
@@ -100,5 +100,10 @@ router.post('/comment/reply', loginCheck, async function (ctx, next) {
         ctx.body = (new ErrorModel('回复评论失败'));
     }
 });
+
+router.get('/analytics', async function (ctx, next) {
+    const result = await getAnalytics()
+    ctx.body = new SuccessModel(result)
+})
 
 module.exports = router

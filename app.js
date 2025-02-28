@@ -12,6 +12,7 @@ const fs = require('fs')
 const morgan = require('koa-morgan')
 const static = require('koa-static')
 const cors = require('koa2-cors')
+const Visit = require('./db/model/visit')
 
 // 设置静态文件目录
 app.use(static(path.join(__dirname, 'uploads')));
@@ -86,6 +87,18 @@ app.use(session({
   })
 }))
 
+// 添加访问记录中间件
+app.use(async (ctx, next) => {
+    try {
+        await Visit.create({
+            ip: ctx.ip,
+            url: ctx.url
+        })
+    } catch (err) {
+        console.error('记录访问失败:', err)
+    }
+    await next()
+})
 
 // routes
 app.use(index.routes(), index.allowedMethods())
