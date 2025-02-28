@@ -102,8 +102,13 @@ router.post('/comment/reply', loginCheck, async function (ctx, next) {
 });
 
 router.get('/analytics', async function (ctx, next) {
-    const result = await getAnalytics()
-    ctx.body = new SuccessModel(result)
+    try {
+        const result = await getAnalytics()
+        ctx.body = new SuccessModel(result)
+    } catch (err) {
+        console.error('Analytics error:', err)
+        ctx.body = new ErrorModel('获取数据失败')
+    }
 })
 
 module.exports = router

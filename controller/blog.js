@@ -152,7 +152,7 @@ const getAnalytics = async () => {
         const thirtyDaysAgo = new Date()
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
         
-        // 获取总访问量（这需要你在应用中添加访问记录）
+        // 获取总访问量
         const totalVisits = await Visit.countDocuments()
         
         // 获取今日新增用户
@@ -186,7 +186,10 @@ const getAnalytics = async () => {
                 }
             },
             {
-                $sort: { _id: 1 }
+                $sort: { _id: -1 } // 改为降序，获取最近的数据
+            },
+            {
+                $limit: 7 // 限制只取7条数据
             }
         ])
         
@@ -209,9 +212,46 @@ const getAnalytics = async () => {
                 }
             },
             {
-                $sort: { _id: 1 }
+                $sort: { _id: -1 }
+            },
+            {
+                $limit: 7
             }
         ])
+
+        // 处理数据，确保有7天的数据
+        const dates = []
+        const now = new Date()
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(now)
+            date.setDate(date.getDate() - i)
+            dates.push(date.toISOString().split('T')[0])
+        }
+
+        // 格式化活跃度数据
+        const activityMap = new Map(activityData.map(item => [item._id, item]))
+        const formattedActivityData = {
+            xAxis: dates,
+            series: {
+                posts: [],
+                likes: [],
+                comments: []
+            }
+        }
+
+        dates.forEach(date => {
+            const data = activityMap.get(date) || { posts: 0, likes: 0, comments: 0 }
+            formattedActivityData.series.posts.push(data.posts)
+            formattedActivityData.series.likes.push(data.likes)
+            formattedActivityData.series.comments.push(data.comments)
+        })
+
+        // 格式化用户趋势数据
+        const userMap = new Map(newUsersTrend.map(item => [item._id, item.count]))
+        const formattedUserTrend = {
+            xAxis: dates,
+            series: dates.map(date => userMap.get(date) || 0)
+        }
 
         return {
             overview: {
@@ -219,12 +259,12 @@ const getAnalytics = async () => {
                 todayNewUsers: newUsers,
                 todayNewPosts: newPosts
             },
-            activityTrend: activityData,
-            userTrend: newUsersTrend
+            activityTrend: formattedActivityData,
+            userTrend: formattedUserTrend
         }
     } catch (err) {
         console.error('获取分析数据失败:', err)
-        return null
+        throw err  // 抛出错误而不是返回 null
     }
 }
 
