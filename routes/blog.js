@@ -119,4 +119,19 @@ router.post('/star', loginCheck, async function (ctx, next) {
     ctx.body = (new SuccessModel(result))
 })
 
+router.get('/user-stats', loginCheck, async function (ctx, next) {
+    try {
+        const username = ctx.session.username
+        const result = await getUserStats(username)
+        if (result) {
+            ctx.body = new SuccessModel(result)
+        } else {
+            ctx.body = new ErrorModel('获取统计数据失败')
+        }
+    } catch (err) {
+        console.error('统计接口错误:', err)
+        ctx.body = new ErrorModel('获取统计数据失败')
+    }
+})
+
 module.exports = router

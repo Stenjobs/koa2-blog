@@ -303,6 +303,32 @@ const getAnalytics = async () => {
     }
 }
 
+const getUserStats = async (username) => {
+    try {
+        // 获取用户的所有博客
+        const blogs = await Blog.find({ author: username })
+        
+        // 初始化统计数据
+        let stats = {
+            totalPosts: 0,      // 发帖总数
+            totalLikes: 0,      // 被点赞总数
+            totalStars: 0       // 被收藏总数
+        }
+        
+        // 如果找到博客，进行统计
+        if (blogs && blogs.length > 0) {
+            stats.totalPosts = blogs.length
+            stats.totalLikes = blogs.reduce((sum, blog) => sum + blog.likes, 0)
+            stats.totalStars = blogs.reduce((sum, blog) => sum + blog.stars, 0)
+        }
+        
+        return stats
+    } catch (err) {
+        console.error('获取用户统计数据失败:', err)
+        return null
+    }
+}
+
 module.exports = {
     getList,
     getDetail,
@@ -313,5 +339,7 @@ module.exports = {
     addComment,
     replyComment,
     getAnalytics,
-    addStar
+    addStar,
+    getUserStats,
+    getUserStats
 }
