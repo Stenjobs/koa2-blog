@@ -1,6 +1,5 @@
 class BaseModel {
     constructor(data,msg,code){
-        console.log(data,msg,code)
         if(typeof data == 'string'){
             this.msg = data
             data = null

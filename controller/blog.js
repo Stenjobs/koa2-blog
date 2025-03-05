@@ -38,6 +38,8 @@ const getDetail = async (id) => {
             return null
         }
         const blog = await Blog.findById(id)
+        blog.views += 1
+        await blog.save()
         return blog
     } catch (err) {
         console.error('获取博客详情失败:', err)
@@ -97,6 +99,32 @@ const likeBlog = async (id, userId,status = true) => {
     }
 }
 
+const addStar = async (id, userId, status = true) => {
+    try {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return null
+        }
+        const blog = await Blog.findById(id)
+        if (!blog) {
+            return null
+        }
+        if (status) {
+            blog.stars += 1
+            blog.starUsers.push(userId)
+        } else {
+            blog.stars -= 1
+            blog.starUsers = blog.starUsers.filter(id => id !== userId)
+        }
+        await blog.save()
+        return blog
+    } catch (err) {
+        console.error('添加收藏失败:', err)
+        return null
+    }
+}
+
+
+
 const addComment = async (id, commentData) => {
     try {
         if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -129,7 +157,6 @@ const replyComment = async (blogId, commentId, replyData, replyToId) => {
             return null;
         }
         const replyItem = comment.replies.id(replyToId);
-        console.log(replyItem,'replyItem-------------------');
         if (replyItem) {
             replyData.replyTo = replyItem.realname;
         }
@@ -285,5 +312,6 @@ module.exports = {
     likeBlog,
     addComment,
     replyComment,
-    getAnalytics
+    getAnalytics,
+    addStar
 }

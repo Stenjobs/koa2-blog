@@ -1,6 +1,6 @@
 const router = require('koa-router')()
 const { SuccessModel, ErrorModel } = require('../model/resModel')
-const { delBlog, getList, newBlog, updataBlog, getDetail, likeBlog, addComment, replyComment, getAnalytics } = require('../controller/blog')
+const { addStar, delBlog, getList, newBlog, updataBlog, getDetail, likeBlog, addComment, replyComment, getAnalytics } = require('../controller/blog')
 const loginCheck = require('../middleware/loginCheck')
 
 router.prefix('/api/blog')
@@ -62,7 +62,6 @@ router.post('/del', loginCheck, async function (ctx, next) {
 })
 
 router.post('/like',loginCheck, async function (ctx, next) {
-    console.log(ctx.session,'0-----------------------')
     const { id,status } = ctx.request.body
     const userId = ctx.session._id
     const result = await likeBlog(id, userId,status)
@@ -109,6 +108,14 @@ router.get('/analytics', async function (ctx, next) {
         console.error('Analytics error:', err)
         ctx.body = new ErrorModel('获取数据失败')
     }
+})
+
+router.post('/star', loginCheck, async function (ctx, next) {
+    const { id, status } = ctx.request.body
+    console.log(ctx.session,'收藏接口')
+    const userId = ctx.session._id
+    const result = await addStar(id, userId, status)
+    ctx.body = (new SuccessModel(result))
 })
 
 module.exports = router
