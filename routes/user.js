@@ -1,7 +1,7 @@
 const router = require('koa-router')()
 const { login,registeUser,getUserList,updateUser,exportUserList } = require('../controller/user')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
-
+const { getUserStats } = require('../controller/blog')
 router.prefix('/api/user')
 const jwt = require('jsonwebtoken')
 const { SECRET_KEY } = require('../config/key')
@@ -10,13 +10,15 @@ const { SECRET_KEY } = require('../config/key')
 router.post('/login', function (ctx, next) {
     const { username, pppp } = ctx.request.body;
     const result = login(username, pppp)
-    return result.then(data => {
+    return result.then(async data => {
         try {
             if (data.username) {
                 // 设置session 记得要确保redis服务正常
                 ctx.session.username = data.username
                 ctx.session.realname = data.realname
                 ctx.session._id = data._id
+                const userStats = await getUserStats(data._id)
+                data.userStats = userStats
                 const token = jwt.sign({ username}, SECRET_KEY, { expiresIn: '24h' })
                 ctx.body = new SuccessModel({ token,userinfo:data })
 

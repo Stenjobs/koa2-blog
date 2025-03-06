@@ -1,6 +1,6 @@
 const router = require('koa-router')()
 const { SuccessModel, ErrorModel } = require('../model/resModel')
-const { addStar, delBlog, getList, newBlog, updataBlog, getDetail, likeBlog, addComment, replyComment, getAnalytics } = require('../controller/blog')
+const {getUserStats, addStar, delBlog, getList, newBlog, updataBlog, getDetail, likeBlog, addComment, replyComment, getAnalytics } = require('../controller/blog')
 const loginCheck = require('../middleware/loginCheck')
 
 router.prefix('/api/blog')
@@ -121,8 +121,8 @@ router.post('/star', loginCheck, async function (ctx, next) {
 
 router.get('/user-stats', loginCheck, async function (ctx, next) {
     try {
-        const username = ctx.session.username
-        const result = await getUserStats(username)
+        const userId = ctx.session._id
+        const result = await getUserStats(userId)
         if (result) {
             ctx.body = new SuccessModel(result)
         } else {

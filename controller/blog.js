@@ -303,16 +303,28 @@ const getAnalytics = async () => {
     }
 }
 
-const getUserStats = async (username) => {
+const getUserStats = async (userId) => {
     try {
+        // 检查id是否为有效的ObjectId格式
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return null
+        }
+        
+        // 获取用户信息
+        const user = await User.findById(userId)
+        if (!user) {
+            return null
+        }
+
         // 获取用户的所有博客
-        const blogs = await Blog.find({ author: username })
+        const blogs = await Blog.find({ author: user.username })
         
         // 初始化统计数据
         let stats = {
             totalPosts: 0,      // 发帖总数
             totalLikes: 0,      // 被点赞总数
-            totalStars: 0       // 被收藏总数
+            totalStars: 0,      // 被收藏总数
+            username: user.username  // 添加用户名信息
         }
         
         // 如果找到博客，进行统计
