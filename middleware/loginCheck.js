@@ -3,6 +3,7 @@ const { ErrorModel } = require('../model/resModel')
 const { SECRET_KEY } = require('../config/key')
 
 module.exports = async (ctx, next) => {
+    console.log('loginCheck middleware session:',ctx.session);
     const token = ctx.header.authorization
     if (!token) {
         ctx.body = new ErrorModel('未登录')
