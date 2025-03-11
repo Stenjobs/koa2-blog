@@ -4,7 +4,7 @@ const xss = require('xss')
 const User = require('../db/model/user')
 const Visit = require('../db/model/visit')
 
-const getList = async (author = '', keyword = '', page = 1, pageSize = 10) => {
+const getList = async (author = '', keyword = '', page = 1, pageSize = 10, mode = 'new') => {
     const whereOption = {}
     // mongoose查询
     if (author) {
@@ -19,10 +19,24 @@ const getList = async (author = '', keyword = '', page = 1, pageSize = 10) => {
     const total = await Blog.countDocuments(whereOption)
     
     // 查询分页数据
-    const list = await Blog.find(whereOption)
-        .sort({ _id: -1 }) // 按id倒序排序,正序则是{ _id: 1 }
-        .skip((page - 1) * pageSize)
-        .limit(pageSize)
+    let list
+    if (mode === 'hot') {
+        // 按热度排序 (点赞 + 收藏 + 浏览量)
+        list = await Blog.aggregate([
+            { $match: whereOption },
+            { $addFields: { hotScore: { $add: ["$likes", "$stars", "$views"] } } },
+            { $sort: { hotScore: -1 } },
+            { $skip: (page - 1) * pageSize },
+            { $limit: Number(pageSize) }
+        ])
+    } else {
+        // 默认按创建时间排序
+        list = await Blog.find(whereOption)
+            .sort({ _id: -1 }) // 按id倒序排序,正序则是{ _id: 1 }
+            .skip((page - 1) * pageSize)
+            .limit(pageSize)
+    }
+    
     return {
         list,
         total,

@@ -15,8 +15,8 @@ router.get('/test', async function (ctx, next) {
 })
 
 router.get('/list', async function (ctx, next) {
-    const { author, keyword, page, pageSize } = ctx.query
-    const result = await getList(author, keyword, page, pageSize)
+    const { author, keyword, page, pageSize,mode } = ctx.query
+    const result = await getList(author, keyword, page, pageSize,mode)
     ctx.body = (new SuccessModel(result))
 });
 
@@ -29,7 +29,6 @@ router.get('/mylist', loginCheck, async function (ctx, next) {
 
 router.post('/new', loginCheck, async function (ctx, next) {
     const blogData = ctx.request.body
-    console.log(ctx.session,'000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000session')
     blogData.author = ctx.session.username
     const result = await newBlog(blogData)
     ctx.body = (new SuccessModel(result))
