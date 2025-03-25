@@ -78,7 +78,9 @@ router.post('/comment',loginCheck, async function (ctx, next) {
     const { id, content } = ctx.request.body
     const userId = ctx.session._id
     const realname = ctx.session.realname
-    const commentData = { userId, realname, content }
+    const avatar = ctx.session.avatar
+    console.log(ctx.session,'评论接口')
+    const commentData = { userId, realname, content,avatar }
     const result = await addComment(id, commentData)
     if (result) {
         ctx.body = (new SuccessModel(result))

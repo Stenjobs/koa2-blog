@@ -6,29 +6,36 @@ const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
 const session = require('koa-generic-session')
-const redisStore = require('koa-redis')
+// const redisStore = require('koa-redis')
+const { redisClient } = require('./db/redis')
 const path = require('path')
 const fs = require('fs')
 const morgan = require('koa-morgan')
 const static = require('koa-static')
+const http = require('http');
 const cors = require('koa2-cors')
 const Visit = require('./db/model/visit')
+const server = http.createServer(app.callback());
+const SocketService = require('./lib/socket');
+
+// 初始化WebSocket服务
+const socketService = new SocketService(server);
 
 // 设置静态文件目录
 app.use(static(path.join(__dirname, 'uploads')));
 
 // 添加cors中间件配置 
-// app.use(cors({
-//   // origin: function(ctx) { // 设置允许来自指定域名请求
-//   //   return '*'; // 允许来自所有域名请求
-//   // },
-//   origin: ['http://localhost:8866'],
-//   maxAge: 5, // 指定本次预检请求的有效期，单位为秒。
-//   credentials: true, // 是否允许发送Cookie
-//   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // 设置所允许的HTTP请求方法
-//   allowHeaders: ['Content-Type', 'Authorization', 'Accept'], // 设置服务器支持的所有头信息字段
-//   exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'] // 设置获取其他自定义字段
-// }));
+app.use(cors({
+  // origin: function(ctx) { // 设置允许来自指定域名请求
+  //   return '*'; // 允许来自所有域名请求
+  // },
+  origin: ['http://localhost:8866'],
+  maxAge: 5, // 指定本次预检请求的有效期，单位为秒。
+  credentials: true, // 是否允许发送Cookie
+  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // 设置所允许的HTTP请求方法
+  allowHeaders: ['Content-Type', 'Authorization', 'Accept'], // 设置服务器支持的所有头信息字段
+  exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'] // 设置获取其他自定义字段
+}));
 
 const REDIS_CONF = require('./config/db.js')
 
@@ -37,6 +44,7 @@ const users = require('./routes/users')
 const blog = require('./routes/blog')
 const user = require('./routes/user')
 const common = require('./routes/common')
+const chat = require('./routes/chat')
 
 // error handler
 onerror(app)
@@ -81,10 +89,7 @@ app.use(session({
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000
   },
-  store: new redisStore({
-    // all: '127.0.0.1:6379' // redis的地址
-    all: `${REDIS_CONF.host}:${REDIS_CONF.port}`
-  })
+  store: redisClient
 }))
 
 // 添加访问记录中间件
@@ -106,6 +111,7 @@ app.use(users.routes(), users.allowedMethods())
 app.use(blog.routes(), blog.allowedMethods())
 app.use(user.routes(), user.allowedMethods())
 app.use(common.routes(), common.allowedMethods())
+app.use(chat.routes(), chat.allowedMethods())
 // error-handling
 app.on('error', (err, ctx) => {
   console.error('server error', err, ctx)

@@ -5,13 +5,15 @@ const CommentSchema = new mongoose.Schema({
     realname: String,
     content: String,
     createdAt: { type: Date, default: Date.now },
+    avatar: String,
     replies: [
         {
             userId: String,
             realname: String,
             content: String,
             createdAt: { type: Date, default: Date.now },
-            replyTo: String
+            replyTo: String,
+            avatar: String
         }
     ]
 });

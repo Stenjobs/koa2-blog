@@ -1,5 +1,5 @@
 const router = require('koa-router')()
-const { login,registeUser,getUserList,updateUser,exportUserList } = require('../controller/user')
+const { login,registeUser,getUserList,updateUser,exportUserList,userInfo } = require('../controller/user')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 const { getUserStats } = require('../controller/blog')
 router.prefix('/api/user')
@@ -17,6 +17,7 @@ router.post('/login', function (ctx, next) {
                 ctx.session.username = data.username
                 ctx.session.realname = data.realname
                 ctx.session._id = data._id
+                ctx.session.avatar = data.avatarPath
                 const userStats = await getUserStats(data._id)
                 data.userStats = userStats
                 const token = jwt.sign({ username}, SECRET_KEY, { expiresIn: '24h' })
@@ -42,6 +43,14 @@ router.post('/register', function (ctx, next) {
         } else {
             ctx.body = new ErrorModel('注册失败:用户已存在')
         }
+    })
+});
+
+router.get('/info', function (ctx, next) {
+    const { _id } = ctx.request.query;
+    const result = userInfo(_id)
+    return result.then(data => {
+        ctx.body = new SuccessModel(data)
     })
 });
 

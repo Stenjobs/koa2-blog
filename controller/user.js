@@ -19,6 +19,12 @@ const login = async (username, password) => {
     }
 }
 
+const userInfo = async (id) => {
+    const user = await User.findById(id)
+    if (!user) return null
+    return user
+}
+
 const registeUser = async (username, password,realname,avatarPath) => {
     const user = await User.findOne({
         username: username
@@ -100,5 +106,6 @@ module.exports = {
     registeUser,
     getUserList,
     updateUser,
-    exportUserList
+    exportUserList,
+    userInfo
 }
