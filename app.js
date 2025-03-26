@@ -20,17 +20,17 @@ const Visit = require('./db/model/visit')
 app.use(static(path.join(__dirname, 'uploads')));
 
 // 添加cors中间件配置 
-app.use(cors({
-  // origin: function(ctx) { // 设置允许来自指定域名请求
-  //   return '*'; // 允许来自所有域名请求
-  // },
-  origin: ['http://localhost:8866'],
-  maxAge: 5, // 指定本次预检请求的有效期，单位为秒。
-  credentials: true, // 是否允许发送Cookie
-  allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // 设置所允许的HTTP请求方法
-  allowHeaders: ['Content-Type', 'Authorization', 'Accept'], // 设置服务器支持的所有头信息字段
-  exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'] // 设置获取其他自定义字段
-}));
+// app.use(cors({
+//   // origin: function(ctx) { // 设置允许来自指定域名请求
+//   //   return '*'; // 允许来自所有域名请求
+//   // },
+//   origin: ['http://localhost:8866'],
+//   maxAge: 5, // 指定本次预检请求的有效期，单位为秒。
+//   credentials: true, // 是否允许发送Cookie
+//   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // 设置所允许的HTTP请求方法
+//   allowHeaders: ['Content-Type', 'Authorization', 'Accept'], // 设置服务器支持的所有头信息字段
+//   exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'] // 设置获取其他自定义字段
+// }));
 
 const REDIS_CONF = require('./config/db.js')
 
