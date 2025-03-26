@@ -15,11 +15,6 @@ const static = require('koa-static')
 const http = require('http');
 const cors = require('koa2-cors')
 const Visit = require('./db/model/visit')
-const server = http.createServer(app.callback());
-const SocketService = require('./lib/socket');
-
-// 初始化WebSocket服务
-const socketService = new SocketService(server);
 
 // 设置静态文件目录
 app.use(static(path.join(__dirname, 'uploads')));

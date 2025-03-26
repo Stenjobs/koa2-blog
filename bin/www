@@ -20,6 +20,10 @@ var port = normalizePort(process.env.PORT || '3000');
  */
 
 var server = http.createServer(app.callback());
+// 初始化 Socket.IO
+const SocketService = require('../lib/socket');
+console.log('正在初始化 Socket.IO 服务...');
+const socketService = new SocketService(server);
 
 /**
  * Listen on provided port, on all network interfaces.

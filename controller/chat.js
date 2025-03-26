@@ -1,35 +1,36 @@
 const { ChatMessage, Friendship } = require('../db/model/chat');
 const { User } = require('../db/model/user');
-const { redisClient } = require('../db/redis');
+const { redis, sessionStore } = require('../db/redis');
 const { SuccessModel, ErrorModel } = require('../model/resModel');
 
 class ChatController {
     // 获取好友列表
     async getFriends(ctx) {
-        const { userId } = ctx.state.user;
+        // const { userId } = ctx.state.user;
+        const userId = ctx.session._id
+        console.log(ctx.session,'ctx.session的值')
+        console.log(userId,'userId的值')
         try {
             const friendships = await Friendship.find({
                 user: userId,
                 status: 'accepted'
-            }).populate('friend', 'username nickname avatar');
+            }).populate('friend', 'username realname avatarPath');
 
             // 获取在线状态
-            const onlineUsers = await redisClient.sMembers('online_users');
+            const onlineUsers = await redis.smembers('online_users');
             const friends = friendships.map(f => ({
                 ...f.friend.toJSON(),
                 online: onlineUsers.includes(f.friend._id.toString())
             }));
 
-            ctx.body = {
-                code: 0,
-                data: friends
-            };
+            ctx.body = new SuccessModel({
+                friends
+            });
         } catch (error) {
             console.error('获取好友列表失败:', error);
-            ctx.body = {
-                code: 500,
+            ctx.body = new ErrorModel({
                 message: '获取好友列表失败'
-            };
+            });
         }
     }
 
@@ -40,25 +41,24 @@ class ChatController {
             const requests = await Friendship.find({
                 friend: userId,
                 status: 'pending'
-            }).populate('user', 'username nickname avatar');
+            }).populate('user', 'username realname avatarPath');
 
-            ctx.body = {
-                code: 0,
-                data: requests
-            };
+            ctx.body = new SuccessModel(
+                requests
+            );
         } catch (error) {
             console.error('获取好友请求列表失败:', error);
-            ctx.body = {
-                code: 500,
+            ctx.body = new ErrorModel({
                 message: '获取好友请求列表失败'
-            };
+            });
         }
     }
 
     // 获取与指定好友的聊天记录
     async getChatHistory(ctx) {
-        const { userId } = ctx.state.user;
-        const { friendId } = ctx.params;
+        // const { userId } = ctx.state.user;
+        const userId = ctx.session._id
+        const { friendId } = ctx.query;
         const { page = 1, size = 20 } = ctx.query;
 
         try {
@@ -71,19 +71,15 @@ class ChatController {
             .sort({ createdAt: -1 })
             .skip((page - 1) * size)
             .limit(parseInt(size))
-            .populate('sender', 'username nickname avatar')
-            .populate('receiver', 'username nickname avatar');
 
-            ctx.body = {
-                code: 0,
-                data: messages.reverse()
-            };
+            ctx.body = new SuccessModel({
+                messages: messages.reverse()
+            });
         } catch (error) {
             console.error('获取聊天记录失败:', error);
-            ctx.body = {
-                code: 500,
+            ctx.body = new ErrorModel({
                 message: '获取聊天记录失败'
-            };
+            });
         }
     }
 
@@ -113,10 +109,9 @@ class ChatController {
                 friend: friendId
             });
 
-            ctx.body = {
-                code: 0,
+            ctx.body = new SuccessModel({
                 message: '好友请求已发送'
-            };
+            });
         } catch (error) {
             console.error('发送好友请求失败:', error);
             ctx.body = {
@@ -128,7 +123,8 @@ class ChatController {
 
     // 处理好友请求
     async handleFriendRequest(ctx) {
-        const { userId } = ctx.state.user;
+        // const { userId } = ctx.state.user;
+        const userId = ctx.session._id
         const { requestId, action } = ctx.request.body;
 
         try {
@@ -156,7 +152,7 @@ class ChatController {
             }
 
             ctx.body = {
-                code: 0,
+                code: 200,
                 message: action === 'accept' ? '已接受好友请求' : '已拒绝好友请求'
             };
         } catch (error) {

@@ -7,7 +7,7 @@ router.prefix('/api/chat');
 router.get('/friends', loginCheck, chatController.getFriends);
 
 // 获取聊天记录
-router.get('/history/:friendId', loginCheck, chatController.getChatHistory);
+router.get('/history', loginCheck, chatController.getChatHistory);
 
 // 发送好友请求
 router.post('/friend-request', loginCheck, chatController.sendFriendRequest);

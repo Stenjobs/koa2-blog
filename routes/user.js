@@ -20,9 +20,16 @@ router.post('/login', function (ctx, next) {
                 ctx.session.avatar = data.avatarPath
                 const userStats = await getUserStats(data._id)
                 data.userStats = userStats
-                const token = jwt.sign({ username}, SECRET_KEY, { expiresIn: '24h' })
-                ctx.body = new SuccessModel({ token,userinfo:data })
-
+                
+                // 修改：在 token 中包含更多用户信息
+                const token = jwt.sign({ 
+                    id: data._id,
+                    username: data.username
+                }, SECRET_KEY, { 
+                    expiresIn: '24h' 
+                })
+                
+                ctx.body = new SuccessModel({ token, userinfo: data })
                 return
             } else {
                 ctx.body = new ErrorModel('账号或密码错误')
