@@ -7,38 +7,37 @@ const jwt = require('jsonwebtoken')
 const { SECRET_KEY } = require('../config/key')
 
 
-router.post('/login', function (ctx, next) {
+router.post('/login', async (ctx) => {
     const { username, pppp } = ctx.request.body;
-    const result = login(username, pppp)
-    return result.then(async data => {
-        try {
-            if (data.username) {
-                // 设置session 记得要确保redis服务正常
-                ctx.session.username = data.username
-                ctx.session.realname = data.realname
-                ctx.session._id = data._id
-                ctx.session.avatar = data.avatarPath
-                const userStats = await getUserStats(data._id)
-                data.userStats = userStats
-                
-                // 修改：在 token 中包含更多用户信息
-                const token = jwt.sign({ 
-                    id: data._id,
-                    username: data.username
-                }, SECRET_KEY, { 
-                    expiresIn: '24h' 
-                })
-                
-                ctx.body = new SuccessModel({ token, userinfo: data })
-                return
-            } else {
-                ctx.body = new ErrorModel('账号或密码错误')
-            }
-        } catch (error) {
-            console.error('Error in login:', error)
-            ctx.body = new ErrorModel('登录失败')
+    try {
+        const data = await login(username, pppp);
+        if (data.username) {
+            // 生成 JWT token，包含用户信息
+            const token = jwt.sign({
+                id: data._id,
+                username: data.username,
+                realname: data.realname,
+                avatar: data.avatarPath
+            }, SECRET_KEY, { 
+                expiresIn: '24h' 
+            });
+
+            // 获取用户统计信息
+            const userStats = await getUserStats(data._id);
+            data.userStats = userStats;
+
+            // 返回 token 和用户信息
+            ctx.body = new SuccessModel({ 
+                token, 
+                userinfo: data 
+            });
+        } else {
+            ctx.body = new ErrorModel('账号或密码错误');
         }
-    })
+    } catch (error) {
+        console.error('Error in login:', error);
+        ctx.body = new ErrorModel('登录失败');
+    }
 });
 
 router.post('/register', function (ctx, next) {

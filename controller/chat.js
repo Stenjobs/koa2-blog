@@ -7,9 +7,7 @@ class ChatController {
     // 获取好友列表
     async getFriends(ctx) {
         // const { userId } = ctx.state.user;
-        const userId = ctx.session._id
-        console.log(ctx.session,'ctx.session的值')
-        console.log(userId,'userId的值')
+        const userId = ctx.state.user.id
         try {
             const friendships = await Friendship.find({
                 user: userId,
@@ -36,7 +34,7 @@ class ChatController {
 
     // 获取好友请求列表
     async getFriendRequests(ctx) {
-        const userId = ctx.session._id
+        const userId = ctx.state.user.id
         try {
             const requests = await Friendship.find({
                 friend: userId,
@@ -57,7 +55,7 @@ class ChatController {
     // 获取与指定好友的聊天记录
     async getChatHistory(ctx) {
         // const { userId } = ctx.state.user;
-        const userId = ctx.session._id
+        const userId = ctx.state.user.id
         const { friendId } = ctx.query;
         const { page = 1, size = 20 } = ctx.query;
 
@@ -85,7 +83,7 @@ class ChatController {
 
     // 发送好友请求
     async sendFriendRequest(ctx) {
-        const userId = ctx.session._id
+        const userId = ctx.state.user.id
         const { friendId } = ctx.request.body;
 
         try {
@@ -124,7 +122,7 @@ class ChatController {
     // 处理好友请求
     async handleFriendRequest(ctx) {
         // const { userId } = ctx.state.user;
-        const userId = ctx.session._id
+        const userId = ctx.state.user.id
         const { requestId, action } = ctx.request.body;
 
         try {
@@ -166,7 +164,7 @@ class ChatController {
 
     // 检查好友关系
     async checkFriendStatus(ctx){
-        const userId = ctx.session._id
+        const userId = ctx.state.user.id
         const { friendId } = ctx.query;
         const relationship = await Friendship.checkFriendship(userId, friendId);
 

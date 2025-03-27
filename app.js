@@ -5,7 +5,6 @@ const json = require('koa-json')
 const onerror = require('koa-onerror')
 const bodyparser = require('koa-bodyparser')
 const logger = require('koa-logger')
-const session = require('koa-generic-session')
 // const redisStore = require('koa-redis')
 const { redisClient } = require('./db/redis')
 const path = require('path')
@@ -75,22 +74,6 @@ if (ENV !== 'production') {
   }
   ));
 }
-
-// session配置
-app.keys = ['caoliwenping'] //秘钥，相当于express中的session.secret
-app.use(session({
-    key: 'koa.sid',
-    cookie: {
-        path: '/',
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-        secure: false,
-        sameSite: 'lax'
-    },
-    store: redisClient,
-    rolling: true,
-    renew: true
-}))
 
 // 添加访问记录中间件
 app.use(async (ctx, next) => {

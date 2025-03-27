@@ -3,7 +3,6 @@ const { ErrorModel } = require('../model/resModel')
 const { SECRET_KEY } = require('../config/key')
 
 module.exports = async (ctx, next) => {
-    console.log('loginCheck middleware session----------:',ctx.session);
     const token = ctx.header.authorization
     if (!token) {
         ctx.body = new ErrorModel('未登录')
@@ -16,7 +15,7 @@ module.exports = async (ctx, next) => {
         ctx.state.user = decoded // 将解码后的用户信息存储到ctx.state中供后续使用
         await next()
     } catch (err) {
-        console.log(err,'login-check--err-------------------');
+        console.error('Token verification failed:', err);
         ctx.body = new ErrorModel('请重新登录', '', 401)
         return
     }

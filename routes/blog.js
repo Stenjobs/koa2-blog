@@ -21,7 +21,7 @@ router.get('/list', async function (ctx, next) {
 });
 
 router.get('/mylist', loginCheck, async function (ctx, next) {
-    const author = ctx.session.username
+    const author = ctx.state.user.username
     const { keyword, page, pageSize } = ctx.query
     const result = await getList(author, keyword, page, pageSize)
     ctx.body = (new SuccessModel(result))
@@ -29,7 +29,7 @@ router.get('/mylist', loginCheck, async function (ctx, next) {
 
 router.post('/new', loginCheck, async function (ctx, next) {
     const blogData = ctx.request.body
-    blogData.author = ctx.session.username
+    blogData.author = ctx.state.user.username
     const result = await newBlog(blogData)
     ctx.body = (new SuccessModel(result))
 
@@ -37,7 +37,7 @@ router.post('/new', loginCheck, async function (ctx, next) {
 
 router.post('/update', loginCheck, async function (ctx, next) {
     const blogData = ctx.request.body
-    blogData.author = ctx.session.username
+    blogData.author = ctx.state.user.username
     const result = await updataBlog(blogData)
     ctx.body = (new SuccessModel(result))
 })
@@ -51,7 +51,7 @@ router.get('/detail', async function (ctx, next) {
 
 router.post('/del', loginCheck, async function (ctx, next) {
     const { id } = ctx.request.body
-    const author = ctx.session.username
+    const author = ctx.state.user.username
     const result = await delBlog(id, author)
     if (result) {
         ctx.body = (new SuccessModel())
@@ -63,7 +63,7 @@ router.post('/del', loginCheck, async function (ctx, next) {
 
 router.post('/like',loginCheck, async function (ctx, next) {
     const { id,status } = ctx.request.body
-    const userId = ctx.session._id
+    const userId = ctx.state.user.id
     const result = await likeBlog(id, userId,status)
     if (result && result.message) {
         ctx.body = (new ErrorModel(result.message))
@@ -76,10 +76,10 @@ router.post('/like',loginCheck, async function (ctx, next) {
 
 router.post('/comment',loginCheck, async function (ctx, next) {
     const { id, content } = ctx.request.body
-    const userId = ctx.session._id
-    const realname = ctx.session.realname
-    const avatar = ctx.session.avatar
-    console.log(ctx.session,'评论接口')
+    const userId = ctx.state.user.id
+    const realname = ctx.state.user.realname
+    const avatar = ctx.state.user.avatar
+    console.log(ctx.state.user,'评论接口')
     const commentData = { userId, realname, content,avatar }
     const result = await addComment(id, commentData)
     if (result) {
@@ -91,8 +91,8 @@ router.post('/comment',loginCheck, async function (ctx, next) {
 
 router.post('/comment/reply', loginCheck, async function (ctx, next) {
     const { blogId, commentId, content,replyToId } = ctx.request.body;
-    const userId = ctx.session._id;
-    const realname = ctx.session.realname;
+    const userId = ctx.state.user.id;
+    const realname = ctx.state.user.realname;
     const replyData = { userId, realname, content,replyToId };
     const result = await replyComment(blogId, commentId, replyData,replyToId);
     if (result) {
@@ -114,15 +114,15 @@ router.get('/analytics', async function (ctx, next) {
 
 router.post('/star', loginCheck, async function (ctx, next) {
     const { id, status } = ctx.request.body
-    console.log(ctx.session,'收藏接口')
-    const userId = ctx.session._id
+    console.log(ctx.state.user,'收藏接口')
+    const userId = ctx.state.user.id
     const result = await addStar(id, userId, status)
     ctx.body = (new SuccessModel(result))
 })
 
 router.get('/user-stats', loginCheck, async function (ctx, next) {
     try {
-        const userId = ctx.session._id
+        const userId = ctx.state.user.id
         const result = await getUserStats(userId)
         if (result) {
             ctx.body = new SuccessModel(result)
