@@ -84,7 +84,7 @@ app.use(session({
         path: '/',
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
-        secure: process.env.NODE_ENV === 'production',
+        secure: false,
         sameSite: 'lax'
     },
     store: redisClient,
