@@ -23,7 +23,8 @@ app.use(cors({
   // origin: function(ctx) { // 设置允许来自指定域名请求
   //   return '*'; // 允许来自所有域名请求
   // },
-  origin: ['http://localhost:8866','http://8.134.205.132:6677'],
+  // origin: ['http://localhost:8866','http://8.134.205.132:6677'],// 实际上配置两个域名，是不生效的，因为cors规则会只允许一个域名。如果配置了两个域名，则需要配置两个cors中间件，或者使用*来允许所有域名。
+  origin: ['http://localhost:8866'],
   maxAge: 5, // 指定本次预检请求的有效期，单位为秒。
   credentials: true, // 是否允许发送Cookie
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // 设置所允许的HTTP请求方法
