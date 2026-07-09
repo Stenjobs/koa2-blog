@@ -1,5 +1,8 @@
 const Koa = require('koa')
 const app = new Koa()
+const dotenv = require('dotenv')
+// 默认读取根目录.env
+dotenv.config()
 const views = require('koa-views')
 const json = require('koa-json')
 const onerror = require('koa-onerror')
@@ -40,6 +43,9 @@ const blog = require('./routes/blog')
 const user = require('./routes/user')
 const common = require('./routes/common')
 const chat = require('./routes/chat')
+const aiChat = require('./routes/AiChat')
+
+
 
 // error handler
 onerror(app)
@@ -96,6 +102,7 @@ app.use(blog.routes(), blog.allowedMethods())
 app.use(user.routes(), user.allowedMethods())
 app.use(common.routes(), common.allowedMethods())
 app.use(chat.routes(), chat.allowedMethods())
+app.use(aiChat.routes(), aiChat.allowedMethods())
 // error-handling
 app.on('error', (err, ctx) => {
   console.error('server error', err, ctx)
