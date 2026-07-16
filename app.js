@@ -17,6 +17,11 @@ const static = require('koa-static')
 const http = require('http');
 const cors = require('koa2-cors')
 const Visit = require('./db/model/visit')
+const fetchLib = require('node-fetch');
+global.fetch = fetchLib;
+global.Headers = fetchLib.Headers;
+global.Request = fetchLib.Request;
+global.Response = fetchLib.Response;
 
 // 设置静态文件目录
 app.use(static(path.join(__dirname, 'uploads')));
