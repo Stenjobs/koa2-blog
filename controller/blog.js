@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const xss = require('xss')
 const User = require('../db/model/user')
 const Visit = require('../db/model/visit')
+const { indexArticle, deleteArticleIndex } = require('../services/ragService')
 
 const getList = async (author = '', keyword = '', page = 1, pageSize = 10, mode = 'new') => {
     const whereOption = {}
@@ -68,6 +69,9 @@ const newBlog = async (blogdata = {}) => {
         author: blogdata.author
     })
 
+    // 异步写入 Chroma，不阻塞发布响应
+    indexArticle(result).catch(console.error)
+
     return result
 }
 
@@ -76,11 +80,22 @@ const updataBlog = async (blogdata = {}) => {
         title: xss(blogdata.title),
         content: blogdata.content
     })
+    
+    if (result) {
+        const updated = await Blog.findById(blogdata._id)
+        indexArticle(updated).catch(console.error)
+    }
+    
     return result
 }
 
 const delBlog = async (id, author) => {
     const result = await Blog.findByIdAndDelete(id)
+    
+    if (result) {
+        deleteArticleIndex(result._id).catch(console.error)
+    }
+    
     return result
 }
 
